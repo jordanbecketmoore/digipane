@@ -1,36 +1,27 @@
-from moviepy import *
+from flask import Flask, request, jsonify
+import os
+from crop import crop_left_video, crop_right_video
+from download import download_youtube_video
 
-def crop_left_video(input_path, output_path):
 
-    # Load the video file
-    video = VideoFileClip(input_path)
+app = Flask(__name__)
 
-    # Crop the video to the left-most 9:16 slice
-    y2 = video.size[1]
-    x2 = y2 * (9 / 16)
-    cropped_video = video.with_effects([vfx.Crop(x1=0, y1=0, x2=x2, y2=y2)])
-
-    # Save the cropped video
-    cropped_video.write_videofile(output_path)
-
-def crop_right_video(input_path, output_path):
-
-    # Load the video file
-    video = VideoFileClip(input_path)
-
-    # Crop the video to the left-most 9:16 slice
-    y2 = video.size[1]
-    x1 = video.size[0] - (y2 * (9 / 16))
-    cropped_video = video.with_effects([vfx.Crop(x1=x1, y1=0, x2=video.size[0], y2=y2)])
-
-    # Save the cropped video
-    cropped_video.write_videofile(output_path)
-# Example usage:
+@app.route('/api/videos', methods=['POST'])
+def post_videos():
+    try:
+        # Extract the "url" field from the JSON payload
+        data = request.get_json()
+        url = data.get("url")
+        
+        if not url:
+            return jsonify({"error": "Missing 'url' field in request payload"}), 400
+        
+        # Call the download_youtube_video function
+        downloaded_path = download_youtube_video(url)
+        
+        return jsonify({"message": "Video downloaded successfully", "path": downloaded_path}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
-    import sys 
-    input_video_path = sys.argv[1]
-    input_video_name = input_video_path.split('/')[-1].split('.')[0]
-    input_video_extension = input_video_path.split('/')[-1].split('.')[-1]
-    crop_left_video(input_video_path, f"{input_video_name}_left_cropped.{input_video_extension}")
-    crop_right_video(input_video_path, f"{input_video_name}_right_cropped.{input_video_extension}")
+    app.run(host="0.0.0.0", port=3141, debug=True)
