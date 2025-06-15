@@ -7,3 +7,4 @@
 *.flv
 *.wmv
 *.gif
+__pycache__
