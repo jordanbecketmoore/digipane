@@ -4,4 +4,8 @@
 
 curl -X PUT http://localhost:3141/api/display \
      -H "Content-Type: application/json" \
-     -d '{"path": "vid.webm"}'
+     -d '{"path": "library/test.mp4"}'
+
+curl -X PUT http://localhost:3141/api/display \
+     -H "Content-Type: application/json" \
+     -d '{"path": "library/drone.mp4"}'

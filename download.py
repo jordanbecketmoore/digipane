@@ -1,6 +1,6 @@
 import yt_dlp 
 
-output_path = "downloaded_videos"
+output_path = "library"
 def download_youtube_video(url): 
     ydl_opts = {
         'format': 'bestvideo+bestaudio/best',  # Download the best video and audio quality
