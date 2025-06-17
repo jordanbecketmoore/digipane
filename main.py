@@ -28,6 +28,32 @@ def post_videos():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@app.route('/api/videos', methods=['UPDATE'])
+def update_videos():
+    try:
+        # Extract the "source" and "destination" fields from the JSON payload
+        data = request.get_json()
+        source = data.get("source")
+        destination = data.get("destination")
+        
+        if not source or not destination:
+            missing = [x for x in ["source", "destination"] if not data.get(x)]
+            return jsonify({"error": f"Missing one or more fields in request payload: {missing}"}), 400
+        if not os.path.exists(source):
+            return jsonify({"error": f"Source file not found: {source}"}), 404
+        if os.path.exists(destination):
+            return jsonify({"error": f"Destination file already exists: {destination}"}), 400
+        
+        # TODO add check for file path validity
+
+        # Rename the file
+        os.rename(source, destination)
+        
+        return jsonify({"message": "Video updated successfully"}), 200
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 @app.route('/api/display', methods=['PUT'])
 def put_display():
     try:
