@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify
 import os
 from crop import crop_left_video, crop_right_video
-from download import download_youtube_video
+from download import add_youtube_video
 import mpv
 from moviepy import VideoFileClip
 import threading
@@ -28,9 +28,9 @@ def post_videos():
         if not url:
             return jsonify({"error": "Missing 'url' field in request payload"}), 400
         
-        # Run the download_youtube_video function in a separate thread
+        # Run the add_youtube_video function in a separate thread
         def background_download():
-            download_youtube_video(url)
+            add_youtube_video(url)
         
         thread = threading.Thread(target=background_download)
         thread.start()
