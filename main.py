@@ -4,12 +4,19 @@ from crop import crop_left_video, crop_right_video
 from download import download_youtube_video
 import mpv
 from moviepy import VideoFileClip
+import threading
+from db import *
 
-
+# Initialize the Flask application
 app = Flask(__name__)
 
+# Initialize the MPV players for left and right displays
 player_right = mpv.MPV()
 player_left = mpv.MPV()
+
+# Load the database
+db.connect()
+db.create_tables([Video], safe=True)
 
 @app.route('/api/videos', methods=['POST'])
 def post_videos():
@@ -21,10 +28,14 @@ def post_videos():
         if not url:
             return jsonify({"error": "Missing 'url' field in request payload"}), 400
         
-        # Call the download_youtube_video function
-        downloaded_path = download_youtube_video(url)
+        # Run the download_youtube_video function in a separate thread
+        def background_download():
+            download_youtube_video(url)
         
-        return jsonify({"message": "Video downloaded successfully", "path": downloaded_path}), 200
+        thread = threading.Thread(target=background_download)
+        thread.start()
+        
+        return jsonify({"message": "Video download started"}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 

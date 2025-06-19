@@ -1,10 +1,12 @@
-.venv
-*.webm
 *.mp4
+*.webm
 *.mkv
 *.avi
 *.mov
 *.flv
 *.wmv
-*.gif
+*.jpeg
+*.jpg
+*.db
 __pycache__
+.venv
